@@ -28,7 +28,7 @@ class AbseilConan(conan_build_helper.CMakePackage):
 
     homepage = "https://github.com/abseil/abseil-cpp"
     repo_url = "https://github.com/abseil/abseil-cpp.git"
-    version = get_version("lts_2020_09_23")
+    version = get_version("lts_2021_11_02")
     url = "https://github.com/conan-io/conan-center-index"
 
     license = "Apache-2.0"
@@ -68,6 +68,11 @@ class AbseilConan(conan_build_helper.CMakePackage):
     @property
     def _source_subfolder(self):
         return "source_subfolder"
+
+    def export_sources(self):
+        self.copy("CMakeLists.txt")
+        for patch in self.conan_data.get("patches", {}).get(self.version, []):
+            self.copy(patch["patch_file"])
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -117,10 +122,11 @@ class AbseilConan(conan_build_helper.CMakePackage):
         if self._cmake:
             return self._cmake
         self._cmake = CMake(self)
-        if not self.settings.compiler.cppstd:
-            self._cmake.definitions["CMAKE_CXX_STANDARD"] = 11
+        #if not self.settings.compiler.cppstd:
+        #    self._cmake.definitions["CMAKE_CXX_STANDARD"] = 11
         self._cmake.definitions["ABSL_ENABLE_INSTALL"] = True
         self._cmake.definitions["BUILD_TESTING"] = False
+        self._cmake.definitions["ABSL_PROPAGATE_CXX_STD"] = True
 
         self._cmake.definitions["ENABLE_UBSAN"] = 'ON'
         if not self.options.enable_ubsan:
@@ -144,6 +150,8 @@ class AbseilConan(conan_build_helper.CMakePackage):
         return self._cmake
 
     def build(self):
+        for patch in self.conan_data.get("patches", {}).get(self.version, []):
+            tools.patch(**patch)
         #for patch in self.conan_data.get("patches", {}).get(self.version, []):
         #    tools.patch(**patch)
         #tools.patch(patch_file = "patches/cmake-install.patch", base_path = self._source_subfolder)

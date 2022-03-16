@@ -43,6 +43,8 @@ class TestPackageConan(conan_build_helper.CMakePackage):
     def build(self):
         cmake = CMake(self)
 
+        cmake.definitions['ABSL_PROPAGATE_CXX_STD'] = 'ON'
+
         cmake.definitions['ENABLE_UBSAN'] = self.options['abseil'].enable_ubsan
         cmake.definitions['ENABLE_ASAN'] = self.options['abseil'].enable_asan
         cmake.definitions['ENABLE_MSAN'] = self.options['abseil'].enable_msan

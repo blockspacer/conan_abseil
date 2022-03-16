@@ -183,6 +183,7 @@ endfunction(sanitize_library)
 
 sanitize_library(LIB_NAME abseil)
 sanitize_library(LIB_NAME absl::strings)
+sanitize_library(LIB_NAME absl::strings_internal)
 sanitize_library(LIB_NAME absl::flat_hash_map)
 sanitize_library(LIB_NAME absl::flat_hash_set)
 sanitize_library(LIB_NAME absl::int128)

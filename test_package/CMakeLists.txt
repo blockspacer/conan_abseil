@@ -111,7 +111,27 @@ endif()
 # Test components
 find_package(absl REQUIRED)
 add_executable(${PROJECT_NAME} test_package.cpp)
-target_link_libraries(${PROJECT_NAME} absl::strings absl::flat_hash_map absl::flat_hash_set absl::int128 absl::time)
+target_link_libraries(${PROJECT_NAME}
+  absl::config
+  #absl::pow10_helper
+  absl::random_random
+  absl::random_distributions
+  absl::base
+  absl::core_headers
+  absl::fixed_array
+  absl::endian
+  absl::dynamic_annotations
+  absl::raw_logging_internal
+  absl::type_traits
+  absl::strings
+  absl::strings_internal
+  absl::btree
+  absl::memory
+  absl::node_hash_map
+  absl::flat_hash_map
+  absl::flat_hash_set
+  absl::int128
+  absl::time)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
 
 # Test also global target

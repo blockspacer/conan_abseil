@@ -122,8 +122,8 @@ class AbseilConan(conan_build_helper.CMakePackage):
         if self._cmake:
             return self._cmake
         self._cmake = CMake(self)
-        #if not self.settings.compiler.cppstd:
-        #    self._cmake.definitions["CMAKE_CXX_STANDARD"] = 11 # use compiler.cppstd
+        if not self.settings.compiler.cppstd:
+            self._cmake.definitions["CMAKE_CXX_STANDARD"] = 11
         self._cmake.definitions["ABSL_ENABLE_INSTALL"] = True
         self._cmake.definitions["BUILD_TESTING"] = False
         self._cmake.definitions["ABSL_PROPAGATE_CXX_STD"] = True
@@ -152,19 +152,21 @@ class AbseilConan(conan_build_helper.CMakePackage):
     def build(self):
         for patch in self.conan_data.get("patches", {}).get(self.version, []):
             tools.patch(**patch)
-        #for patch in self.conan_data.get("patches", {}).get(self.version, []):
-        #    tools.patch(**patch)
-        #tools.patch(patch_file = "patches/cmake-install.patch", base_path = self._source_subfolder)
-        cmake = self._configure_cmake()
-        cmake.build()
+        with tools.vcvars(self.settings, only_diff=False): # https://github.com/conan-io/conan/issues/6577
+            #for patch in self.conan_data.get("patches", {}).get(self.version, []):
+            #    tools.patch(**patch)
+            #tools.patch(patch_file = "patches/cmake-install.patch", base_path = self._source_subfolder)
+            cmake = self._configure_cmake()
+            cmake.build()
 
     def package(self):
-        self.copy("LICENSE", dst="licenses", src=self._source_subfolder)
-        cmake = self._configure_cmake()
-        cmake.install()
-        cmake_folder = os.path.join(self.package_folder, "lib", "cmake")
-        self._create_components_file_from_cmake_target_file(os.path.join(cmake_folder, "absl", "abslTargets.cmake"))
-        tools.rmdir(cmake_folder)
+        with tools.vcvars(self.settings, only_diff=False): # https://github.com/conan-io/conan/issues/6577
+            self.copy("LICENSE", dst="licenses", src=self._source_subfolder)
+            cmake = self._configure_cmake()
+            cmake.install()
+            cmake_folder = os.path.join(self.package_folder, "lib", "cmake")
+            self._create_components_file_from_cmake_target_file(os.path.join(cmake_folder, "absl", "abslTargets.cmake"))
+            tools.rmdir(cmake_folder)
 
     def _create_components_file_from_cmake_target_file(self, absl_target_file_path):
         components = {}
